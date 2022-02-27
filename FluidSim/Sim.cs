@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics.CodeAnalysis;
 using SFML.Graphics;
 using SFML.System;
@@ -5,7 +6,7 @@ using SFML.Window;
 
 namespace FluidSim
 {
-    public class Sim
+    public class Sim : IDisposable
     {
         public static int SIZE = 70;
         public static int SCALE = 8;
@@ -36,6 +37,7 @@ namespace FluidSim
                 win.Closed += (sender, e) =>
                 {
                     ((Window)sender)?.Close();
+                    Dispose();
                 };
                 win.KeyPressed += (sender, e) =>
                 {
@@ -68,6 +70,11 @@ namespace FluidSim
                 win.Display();
             }
             
+        }
+
+        public void Dispose()
+        {
+            GC.SuppressFinalize(this);
         }
     }
 }

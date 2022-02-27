@@ -6,8 +6,10 @@ namespace FluidSim
     {
         static void Main(string[] args)
         {
-            Sim s = new Sim();
-            s.Run();
+            using (var sim = new Sim())
+            {
+                sim.Run();
+            }
         }
     }
 }
