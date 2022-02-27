@@ -68,7 +68,8 @@ namespace FluidSim
         
         public void AddDensity(int x, int y, float amount)
         {
-            this.density[IX._IX(x,y,this.size)] += amount;
+            this.density[IX._IX(x,y,this.size)] = Math.Min(1f,this.density[IX._IX(x, y, this.size)] + amount);
+            
         }
         
         public void AddVelocity(float x, float y, float px, float py)
