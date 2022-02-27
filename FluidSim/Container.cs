@@ -12,6 +12,11 @@ namespace FluidSim
         private Physics physics;
         private int size;
         
+        private Sprite sprite;
+        private Texture texture;
+        private RenderTexture renderTexture;
+        private Image image;
+        
         private float dt;
         private float diff;
         private float visc;
@@ -42,6 +47,13 @@ namespace FluidSim
         public Container(float dt, float diff, float visc)
         {
             physics = new Physics();
+            //----- create sprite and set it to intrect
+            image = new Image((uint) SCALE, (uint) SCALE);
+            sprite = new Sprite();
+            texture = new Texture((uint) SIZE, (uint) SIZE);
+            renderTexture = new RenderTexture((uint) SIZE, (uint) SIZE);
+            sprite.Texture = texture;
+            
             this.size = SIZE;
             this.dt = dt;
             this.diff = diff;
@@ -121,28 +133,35 @@ namespace FluidSim
             for (int i = 0; i < size; i++) {
                 for(int j = 0; j < size; j++)
                 {
-                    RectangleShape rect = new RectangleShape();
-                    rect.Size = new Vector2f(SCALE, SCALE);
-                    rect.Position = new Vector2f(j * SCALE, i * SCALE);
-			
+                    //RectangleShape rect = new RectangleShape();
+                    //rect.Position = new Vector2f(j * SCALE, i * SCALE);
+                    //var L = image.GetPixel(j * SCALE, i * SCALE);
                     switch (color) {
                         case Color.Default:
-                            rect.FillColor = new SFML.Graphics.Color(255, 255, 255, (byte) ((density[IX._IX(i,j,size)] > 255) ? 255 : density[IX._IX(i,j,size)]));
+                            //rect.FillColor = new SFML.Graphics.Color(255, 255, 255, (byte) ((density[IX._IX(i,j,size)] > 255) ? 255 : density[IX._IX(i,j,size)])));
+                            image.SetPixel( (uint) (j * SCALE),  (uint) (i * SCALE),
+                                new SFML.Graphics.Color(255, 255, 255,
+                                    (byte) ((density[IX._IX(i, j, size)] > 255) ? 255 : density[IX._IX(i, j, size)])));
                             break;
                         case Color.Hsb:
-                            rect.FillColor = new SFML.Graphics.Color(Hsv((int) (density[IX._IX(i,j,size)]), 1, 1, 255));
+                            //rect.FillColor = new SFML.Graphics.Color(Hsv((int) (density[IX._IX(i,j,size)]), 1, 1, 255));
+                            image.SetPixel( (uint) (j * SCALE),  (uint) (i * SCALE),
+                                new SFML.Graphics.Color(Hsv((int) (density[IX._IX(i,j,size)]), 1, 1, 255)));
+                            
                             break;
                         case Color.Velocity: {
                             int r = (int)MapToRange(x[IX._IX(i,j,size)], -0.05f, 0.05f, 0, 255);
                             int g = (int)MapToRange(y[IX._IX(i,j,size)], -0.05f, 0.05f, 0, 255);
-                            rect.FillColor = new SFML.Graphics.Color((byte) r, (byte) g, 255);
+                           // rect.FillColor = new SFML.Graphics.Color((byte) r, (byte) g, 255);
+                            image.SetPixel( (uint) (j * SCALE),  (uint) (i * SCALE),
+                                new SFML.Graphics.Color((byte) r, (byte) g, 255));
                             break;
                         }
                         default:
                             break;
-                    };	
-
-                    win.Draw(rect);
+                    };
+                    sprite.Texture = texture;
+                    win.Draw(sprite);
                 }
             }
         }

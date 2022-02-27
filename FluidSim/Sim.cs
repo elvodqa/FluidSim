@@ -1,5 +1,7 @@
 using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
@@ -26,41 +28,45 @@ namespace FluidSim
             win = new RenderWindow(new VideoMode((uint) (SIZE*SCALE), (uint) (SIZE*SCALE)), "Fluid Simulation", Styles.Close | Styles.Titlebar);
         }
 
-        //[SuppressMessage("ReSharper.DPA", "DPA0001: Memory allocation issues")]
         public void Run()
         {
             Vector2i previousMouse = Mouse.GetPosition(win);
             Vector2i currentMouse = Mouse.GetPosition(win);
 
+            win.Closed += (sender, e) =>
+            {
+                ((Window)sender)?.Close();
+                Dispose();
+            };
+            win.KeyPressed += (sender, e) =>
+            {
+                if (e.Code == Keyboard.Key.C)
+                {
+                    Color c = (options.GetColor() == Color.Default) ?
+                        Color.Hsb : (options.GetColor() == Color.Hsb) ?
+                            Color.Velocity : Color.Default;
+
+                    options.SetColor(c);
+                }
+            };
+            win.MouseButtonPressed += (sender, e) =>
+            {
+                if (e.Button == Mouse.Button.Right)
+                {
+                    Color c = (options.GetColor() == Color.Default) ?
+                        Color.Hsb : (options.GetColor() == Color.Hsb) ?
+                            Color.Velocity : Color.Default;
+
+                    options.SetColor(c);
+                }
+            };
+            
+            var stopwatch = new Stopwatch();
+            
             while (win.IsOpen)
             {
-                win.Closed += (sender, e) =>
-                {
-                    ((Window)sender)?.Close();
-                    Dispose();
-                };
-                win.KeyPressed += (sender, e) =>
-                {
-                    if (e.Code == Keyboard.Key.C)
-                    {
-                        Color c = (options.GetColor() == Color.Default) ?
-                            Color.Hsb : (options.GetColor() == Color.Hsb) ?
-                                Color.Velocity : Color.Default;
-
-                        options.SetColor(c);
-                    }
-                };
-                win.MouseButtonPressed += (sender, e) =>
-                {
-                    if (e.Button == Mouse.Button.Right)
-                    {
-                        Color c = (options.GetColor() == Color.Default) ?
-                            Color.Hsb : (options.GetColor() == Color.Hsb) ?
-                                Color.Velocity : Color.Default;
-
-                        options.SetColor(c);
-                    }
-                };
+                stopwatch.Reset();
+                stopwatch.Start();
                 
                 if (Mouse.IsButtonPressed(Mouse.Button.Left))			
                     container.AddDensity(currentMouse.Y/SCALE, currentMouse.X/SCALE, 200);
@@ -80,6 +86,11 @@ namespace FluidSim
                 container.FadeDensity(SIZE*SIZE);
 		        
                 win.Display();
+                if (stopwatch.ElapsedMilliseconds<=33)
+                {
+                    
+                    Thread.Sleep(TimeSpan.FromMilliseconds(33)-stopwatch.Elapsed);
+                }
             }
             
         }
