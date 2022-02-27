@@ -10,8 +10,10 @@ namespace FluidSim
 {
     public class Sim : IDisposable
     {
-        public static int SIZE = 70;
-        public static int SCALE = 8;
+        public static int rowPxSIZE = 70;
+        public static int columnPxSIZE = 70;
+        public static int screenPerPX = 10;
+
         
         private RenderWindow win;
 
@@ -25,7 +27,7 @@ namespace FluidSim
         {
             options = new Options();
             container = new Container(0.2f, 0, 0.0000001f);
-            win = new RenderWindow(new VideoMode((uint) (SIZE*SCALE), (uint) (SIZE*SCALE)), "Fluid Simulation", Styles.Close | Styles.Titlebar);
+            win = new RenderWindow(new VideoMode((uint) (rowPxSIZE*screenPerPX), (uint) (columnPxSIZE*screenPerPX)), "Fluid Simulation", Styles.Close | Styles.Titlebar);
         }
 
         public void Run()
@@ -69,21 +71,21 @@ namespace FluidSim
                 stopwatch.Start();
                 
                 if (Mouse.IsButtonPressed(Mouse.Button.Left))			
-                    container.AddDensity(currentMouse.Y/SCALE, currentMouse.X/SCALE, 200);
+                    container.AddDensity(currentMouse.Y/screenPerPX, currentMouse.X/screenPerPX, 200);
 
                 currentMouse = Mouse.GetPosition(win);
 
                 float amountX = currentMouse.X - previousMouse.X;
                 float amountY = currentMouse.Y - previousMouse.Y;
 
-                container.AddVelocity(currentMouse.Y/SCALE, currentMouse.X/SCALE, amountY / 10, amountX / 10);
+                container.AddVelocity(currentMouse.Y/screenPerPX, currentMouse.X/screenPerPX, amountY / 10, amountX / 10);
 		
                 previousMouse = currentMouse;
 
                 container.Step();
                 container.Render(ref win, options.GetColor());
                 //container.Dispose();
-                container.FadeDensity(SIZE*SIZE);
+                container.FadeDensity(screenPerPX*screenPerPX);
 		        
                 win.Display();
                 if (stopwatch.ElapsedMilliseconds<=33)

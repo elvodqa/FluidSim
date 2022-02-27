@@ -6,8 +6,8 @@ namespace FluidSim
 {
     public class Container : IDisposable
     {
-        public static int SIZE = 70;
-        public static int SCALE = 8;
+        public static int SIZE =>Sim.rowPxSIZE;
+        public static int SCALE =>Sim.screenPerPX;
         
         private Physics physics;
         private int size;
@@ -50,7 +50,7 @@ namespace FluidSim
             image = new Image((uint)560, (uint) 560);
             texture = new Texture((uint) 560, (uint) 560);
             sprite = new Sprite(texture);
-          
+            sprite.Scale = new Vector2f(Sim.screenPerPX,Sim.screenPerPX);
           
             
             this.size = SIZE;
@@ -136,34 +136,36 @@ namespace FluidSim
                     //rect.Position = new Vector2f(j * SCALE, i * SCALE);
                     //var L = image.GetPixel(j * SCALE, i * SCALE);
                     switch (color) {
-                        case Color.Default:
-                            //rect.FillColor = new SFML.Graphics.Color(255, 255, 255, (byte) ((density[IX._IX(i,j,size)] > 255) ? 255 : density[IX._IX(i,j,size)])));
-                            image.SetPixel( (uint) (j * SCALE),  (uint) (i * SCALE),
-                                new SFML.Graphics.Color(255, 255, 255,
-                                    (byte) ((density[IX._IX(i, j, size)] > 255) ? 255 : density[IX._IX(i, j, size)])));
-                            break;
-                        case Color.Hsb:
-                            //rect.FillColor = new SFML.Graphics.Color(Hsv((int) (density[IX._IX(i,j,size)]), 1, 1, 255));
-                            image.SetPixel( (uint) (j * SCALE),  (uint) (i * SCALE),
-                                new SFML.Graphics.Color(Hsv((int) (density[IX._IX(i,j,size)]), 1, 1, 255)));
-                            
-                            break;
-                        case Color.Velocity: {
-                            int r = (int)MapToRange(x[IX._IX(i,j,size)], -0.05f, 0.05f, 0, 255);
-                            int g = (int)MapToRange(y[IX._IX(i,j,size)], -0.05f, 0.05f, 0, 255);
-                           // rect.FillColor = new SFML.Graphics.Color((byte) r, (byte) g, 255);
-                            image.SetPixel( (uint) (j * SCALE),  (uint) (i * SCALE),
-                                new SFML.Graphics.Color((byte) r, (byte) g, 255));
-                            break;
-                        }
+                        // case Color.Default:
+                        //     //rect.FillColor = new SFML.Graphics.Color(255, 255, 255, (byte) ((density[IX._IX(i,j,size)] > 255) ? 255 : density[IX._IX(i,j,size)])));
+                        //     image.SetPixel( (uint) (j),  (uint) (i),
+                        //         new SFML.Graphics.Color(255, 255, 255,
+                        //             (byte) ((density[IX._IX(i, j, size)] > 255) ? 255 : density[IX._IX(i, j, size)])));
+                        //     break;
+                        // case Color.Hsb:
+                        //     //rect.FillColor = new SFML.Graphics.Color(Hsv((int) (density[IX._IX(i,j,size)]), 1, 1, 255));
+                        //     image.SetPixel( (uint) (j ),  (uint) (i),
+                        //         new SFML.Graphics.Color(Hsv((int) (density[IX._IX(i,j,size)]), 1, 1, 255)));
+                        //     
+                        //     break;
+                        // case Color.Velocity: {
+                        //     int r = (int)MapToRange(x[IX._IX(i,j,size)], -0.05f, 0.05f, 0, 255);
+                        //     int g = (int)MapToRange(y[IX._IX(i,j,size)], -0.05f, 0.05f, 0, 255);
+                        //    // rect.FillColor = new SFML.Graphics.Color((byte) r, (byte) g, 255);
+                        //     image.SetPixel( (uint) (j),  (uint) (i),
+                        //         new SFML.Graphics.Color((byte) r, (byte) g, 255));
+                        //     break;
+                        // }
                         default:
+                            var d = (byte)(density[IX.Flatten2dTo1D(i, j, Sim.rowPxSIZE)]*255);
+                            image.SetPixel((uint)i,(uint)j,new SFML.Graphics.Color(d,d,d));
                             break;
                     };
-                    texture.Update(image);
-                    sprite.Texture = texture;
-                    win.Draw(sprite);
                 }
             }
+            texture.Update(image);
+            sprite.Texture = texture;
+            win.Draw(sprite);
         }
 
         public void FadeDensity(int _size)
