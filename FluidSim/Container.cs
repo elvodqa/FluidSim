@@ -14,7 +14,6 @@ namespace FluidSim
         
         private Sprite sprite;
         private Texture texture;
-        private RenderTexture renderTexture;
         private Image image;
         
         private float dt;
@@ -48,11 +47,11 @@ namespace FluidSim
         {
             physics = new Physics();
             //----- create sprite and set it to intrect
-            image = new Image((uint) SCALE, (uint) SCALE);
-            sprite = new Sprite();
-            texture = new Texture((uint) SIZE, (uint) SIZE);
-            renderTexture = new RenderTexture((uint) SIZE, (uint) SIZE);
-            sprite.Texture = texture;
+            image = new Image((uint)560, (uint) 560);
+            texture = new Texture((uint) 560, (uint) 560);
+            sprite = new Sprite(texture);
+          
+          
             
             this.size = SIZE;
             this.dt = dt;
@@ -160,6 +159,7 @@ namespace FluidSim
                         default:
                             break;
                     };
+                    texture.Update(image);
                     sprite.Texture = texture;
                     win.Draw(sprite);
                 }
