@@ -85,10 +85,11 @@ namespace FluidSim
                 container.Step();
                 container.Render(ref win, options.GetColor());
                 //container.Dispose();
-                container.FadeDensity(screenPerPX*screenPerPX);
+                // container.FadeDensity(screenPerPX*screenPerPX);
 		        
                 win.Display();
-                if (stopwatch.ElapsedMilliseconds<=33)
+                Thread.Yield();
+                if (stopwatch.ElapsedMilliseconds<33)
                 {
                     
                     Thread.Sleep(TimeSpan.FromMilliseconds(33)-stopwatch.Elapsed);

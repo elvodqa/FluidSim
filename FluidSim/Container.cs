@@ -157,7 +157,7 @@ namespace FluidSim
                         //     break;
                         // }
                         default:
-                            var d = (byte)(density[IX.Flatten2dTo1D(i, j, Sim.rowPxSIZE)]*255);
+                            var d = (byte)Math.Floor(density[IX.Flatten2dTo1D(j, i, Sim.rowPxSIZE)]*255);
                             image.SetPixel((uint)i,(uint)j,new SFML.Graphics.Color(d,d,d));
                             break;
                     };
