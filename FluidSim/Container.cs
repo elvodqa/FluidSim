@@ -20,14 +20,14 @@ namespace FluidSim
         private float diff;
         private float visc;
 
-        private float[] px = new float[SIZE * SIZE];
-        private float[] py = new float[SIZE * SIZE];
+        private float[] px = new float[Sim.rowPxSIZE * Sim.rowPxSIZE];
+        private float[] py = new float[Sim.columnPxSIZE * Sim.columnPxSIZE];
         
-        private float[] x = new float[SIZE * SIZE];
-        private float[] y = new float[SIZE * SIZE];
+        private float[] x =  new float[Sim.rowPxSIZE * Sim.rowPxSIZE];
+        private float[] y =  new float[Sim.columnPxSIZE * Sim.columnPxSIZE];
         
-        private float[] previousDensity= new float[SIZE * SIZE];
-        private float[] density = new float[SIZE * SIZE];
+        private float[] previousDensity= new float[Sim.columnPxSIZE * Sim.rowPxSIZE];
+        private float[] density = new float[Sim.columnPxSIZE * Sim.rowPxSIZE];
 
         private void InitArr(float[] arr, int size)
         {
