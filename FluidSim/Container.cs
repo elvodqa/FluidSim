@@ -1,9 +1,10 @@
+using System;
 using SFML.Graphics;
 using SFML.System;
 
 namespace FluidSim
 {
-    public class Container
+    public class Container : IDisposable
     {
         public static int SIZE = 70;
         public static int SCALE = 8;
@@ -113,12 +114,12 @@ namespace FluidSim
             }
         }
 
-        public void Render(RenderWindow win, FluidSim.Color color)
+        public void Render(ref RenderWindow win, FluidSim.Color color)
         {
             win.Clear();
             
-            for (int i = 0; i < this.size; i++) {
-                for(int j = 0; j < this.size; j++)
+            for (int i = 0; i < size; i++) {
+                for(int j = 0; j < size; j++)
                 {
                     RectangleShape rect = new RectangleShape();
                     rect.Size = new Vector2f(SCALE, SCALE);
@@ -126,14 +127,14 @@ namespace FluidSim
 			
                     switch (color) {
                         case Color.Default:
-                            rect.FillColor = new SFML.Graphics.Color(255, 255, 255, (byte) ((this.density[IX._IX(i,j,this.size)] > 255) ? 255 : this.density[IX._IX(i,j,this.size)]));
+                            rect.FillColor = new SFML.Graphics.Color(255, 255, 255, (byte) ((density[IX._IX(i,j,size)] > 255) ? 255 : density[IX._IX(i,j,size)]));
                             break;
                         case Color.Hsb:
-                            rect.FillColor = new SFML.Graphics.Color(this.Hsv((int) (this.density[IX._IX(i,j,this.size)]), 1, 1, 255));
+                            rect.FillColor = new SFML.Graphics.Color(Hsv((int) (density[IX._IX(i,j,size)]), 1, 1, 255));
                             break;
                         case Color.Velocity: {
-                            int r = (int)MapToRange(this.x[IX._IX(i,j,this.size)], -0.05f, 0.05f, 0, 255);
-                            int g = (int)MapToRange(this.y[IX._IX(i,j,this.size)], -0.05f, 0.05f, 0, 255);
+                            int r = (int)MapToRange(x[IX._IX(i,j,size)], -0.05f, 0.05f, 0, 255);
+                            int g = (int)MapToRange(y[IX._IX(i,j,size)], -0.05f, 0.05f, 0, 255);
                             rect.FillColor = new SFML.Graphics.Color((byte) r, (byte) g, 255);
                             break;
                         }
@@ -153,6 +154,10 @@ namespace FluidSim
                 density[i] = (d - 0.05f < 0) ? 0 : d - 0.05f; 
             }
         }
-        
+
+        public void Dispose()
+        {
+            //GC.SuppressFinalize(this);
+        }
     }
 }

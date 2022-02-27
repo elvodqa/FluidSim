@@ -50,6 +50,17 @@ namespace FluidSim
                         options.SetColor(c);
                     }
                 };
+                win.MouseButtonPressed += (sender, e) =>
+                {
+                    if (e.Button == Mouse.Button.Right)
+                    {
+                        Color c = (options.GetColor() == Color.Default) ?
+                            Color.Hsb : (options.GetColor() == Color.Hsb) ?
+                                Color.Velocity : Color.Default;
+
+                        options.SetColor(c);
+                    }
+                };
                 
                 if (Mouse.IsButtonPressed(Mouse.Button.Left))			
                     container.AddDensity(currentMouse.Y/SCALE, currentMouse.X/SCALE, 200);
@@ -64,17 +75,18 @@ namespace FluidSim
                 previousMouse = currentMouse;
 
                 container.Step();
-                container.Render(win, options.GetColor());
+                container.Render(ref win, options.GetColor());
+                //container.Dispose();
                 container.FadeDensity(SIZE*SIZE);
 		        
                 win.Display();
             }
             
         }
-
+        
         public void Dispose()
         {
-            GC.SuppressFinalize(this);
+            //GC.SuppressFinalize(this);
         }
     }
 }
