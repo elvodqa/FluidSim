@@ -11,7 +11,7 @@ namespace FluidSim
         public static int SIZE = 70;
         public static int SCALE = 8;
         
-        private RenderWindow win;
+        private GameWindow Window;
 
         private Container container;
 
@@ -23,23 +23,37 @@ namespace FluidSim
         {
             options = new Options();
             container = new Container(0.2f, 0, 0.0000001f);
-            win = new RenderWindow(new VideoMode((uint) (SIZE*SCALE), (uint) (SIZE*SCALE)), "Fluid Simulation", Styles.Close | Styles.Titlebar);
+            //Window = new RenderWindow(new VideoMode((uint) (SIZE*SCALE), (uint) (SIZE*SCALE)), "Fluid Simulation", Styles.Close | Styles.Titlebar);
+            Window = new GameWindow("Title",(uint) (SIZE*SCALE), (uint) (SIZE*SCALE));
         }
 
         //[SuppressMessage("ReSharper.DPA", "DPA0001: Memory allocation issues")]
         public void Run()
         {
-            Vector2i previousMouse = Mouse.GetPosition(win);
-            Vector2i currentMouse = Mouse.GetPosition(win);
+           Window.SetVisible(true);
+           while (true)
+           {
+               Window.DispatchEvents();
+               Window.Clear();
+               Update();
+               Window.Display();
+           }
+            
+        }
 
-            while (win.IsOpen)
-            {
-                win.Closed += (sender, e) =>
+        private void Update()
+        {
+            Vector2i previousMouse = Mouse.GetPosition(Window);
+            Vector2i currentMouse = Mouse.GetPosition(Window);
+
+           
+            
+                Window.Closed += (sender, e) =>
                 {
                     ((Window)sender)?.Close();
                     Dispose();
                 };
-                win.KeyPressed += (sender, e) =>
+                Window.KeyPressed += (sender, e) =>
                 {
                     if (e.Code == Keyboard.Key.C)
                     {
@@ -50,7 +64,7 @@ namespace FluidSim
                         options.SetColor(c);
                     }
                 };
-                win.MouseButtonPressed += (sender, e) =>
+                Window.MouseButtonPressed += (sender, e) =>
                 {
                     if (e.Button == Mouse.Button.Right)
                     {
@@ -65,7 +79,7 @@ namespace FluidSim
                 if (Mouse.IsButtonPressed(Mouse.Button.Left))			
                     container.AddDensity(currentMouse.Y/SCALE, currentMouse.X/SCALE, 200);
 
-                currentMouse = Mouse.GetPosition(win);
+                currentMouse = Mouse.GetPosition(Window);
 
                 float amountX = currentMouse.X - previousMouse.X;
                 float amountY = currentMouse.Y - previousMouse.Y;
@@ -75,12 +89,11 @@ namespace FluidSim
                 previousMouse = currentMouse;
 
                 container.Step();
-                container.Render(ref win, options.GetColor());
+                container.Render(Window, options.GetColor());
                 //container.Dispose();
                 container.FadeDensity(SIZE*SIZE);
 		        
-                win.Display();
-            }
+               
             
         }
         

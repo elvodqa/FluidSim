@@ -114,7 +114,7 @@ namespace FluidSim
             }
         }
 
-        public void Render(ref RenderWindow win, FluidSim.Color color)
+        public void Render(GameWindow win, FluidSim.Color color)
         {
             win.Clear();
             
