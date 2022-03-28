@@ -17,7 +17,7 @@ namespace FluidSim
         #region Protected Constructors
 
         public GameWindow(string title, uint width, uint height)
-            : base(new VideoMode(800, 600), title, Styles.Close)
+            : base(new VideoMode(width, height), title, Styles.Close)
         {
             _title = title;
         }

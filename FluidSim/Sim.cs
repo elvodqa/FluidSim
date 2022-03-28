@@ -25,6 +25,33 @@ namespace FluidSim
             container = new Container(0.2f, 0, 0.0000001f);
             //Window = new RenderWindow(new VideoMode((uint) (SIZE*SCALE), (uint) (SIZE*SCALE)), "Fluid Simulation", Styles.Close | Styles.Titlebar);
             Window = new GameWindow("Title",(uint) (SIZE*SCALE), (uint) (SIZE*SCALE));
+            Window.Closed += (sender, e) =>
+            {
+                ((Window)sender)?.Close();
+                Dispose();
+            };
+            Window.KeyPressed += (sender, e) =>
+            {
+                if (e.Code == Keyboard.Key.C)
+                {
+                    Color c = (options.GetColor() == Color.Default) ?
+                        Color.Hsb : (options.GetColor() == Color.Hsb) ?
+                            Color.Velocity : Color.Default;
+
+                    options.SetColor(c);
+                }
+            };
+            Window.MouseButtonPressed += (sender, e) =>
+            {
+                if (e.Button == Mouse.Button.Right)
+                {
+                    Color c = (options.GetColor() == Color.Default) ?
+                        Color.Hsb : (options.GetColor() == Color.Hsb) ?
+                            Color.Velocity : Color.Default;
+
+                    options.SetColor(c);
+                }
+            };
         }
 
         //[SuppressMessage("ReSharper.DPA", "DPA0001: Memory allocation issues")]
@@ -45,56 +72,23 @@ namespace FluidSim
         {
             Vector2i previousMouse = Mouse.GetPosition(Window);
             Vector2i currentMouse = Mouse.GetPosition(Window);
+            if (Mouse.IsButtonPressed(Mouse.Button.Left))			
+                container.AddDensity(currentMouse.Y/SCALE, currentMouse.X/SCALE, 200);
 
-           
-            
-                Window.Closed += (sender, e) =>
-                {
-                    ((Window)sender)?.Close();
-                    Dispose();
-                };
-                Window.KeyPressed += (sender, e) =>
-                {
-                    if (e.Code == Keyboard.Key.C)
-                    {
-                        Color c = (options.GetColor() == Color.Default) ?
-                            Color.Hsb : (options.GetColor() == Color.Hsb) ?
-                                Color.Velocity : Color.Default;
+            currentMouse = Mouse.GetPosition(Window);
 
-                        options.SetColor(c);
-                    }
-                };
-                Window.MouseButtonPressed += (sender, e) =>
-                {
-                    if (e.Button == Mouse.Button.Right)
-                    {
-                        Color c = (options.GetColor() == Color.Default) ?
-                            Color.Hsb : (options.GetColor() == Color.Hsb) ?
-                                Color.Velocity : Color.Default;
+            float amountX = currentMouse.X - previousMouse.X;
+            float amountY = currentMouse.Y - previousMouse.Y;
 
-                        options.SetColor(c);
-                    }
-                };
-                
-                if (Mouse.IsButtonPressed(Mouse.Button.Left))			
-                    container.AddDensity(currentMouse.Y/SCALE, currentMouse.X/SCALE, 200);
+            container.AddVelocity(currentMouse.Y/SCALE, currentMouse.X/SCALE, amountY / 10, amountX / 10);
+	
+            previousMouse = currentMouse;
 
-                currentMouse = Mouse.GetPosition(Window);
+            container.Step();
+            container.Render(Window, options.GetColor());
+            //container.Dispose();
+            container.FadeDensity(SIZE*SIZE);
 
-                float amountX = currentMouse.X - previousMouse.X;
-                float amountY = currentMouse.Y - previousMouse.Y;
-
-                container.AddVelocity(currentMouse.Y/SCALE, currentMouse.X/SCALE, amountY / 10, amountX / 10);
-		
-                previousMouse = currentMouse;
-
-                container.Step();
-                container.Render(Window, options.GetColor());
-                //container.Dispose();
-                container.FadeDensity(SIZE*SIZE);
-		        
-               
-            
         }
         
         public void Dispose()
