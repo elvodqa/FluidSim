@@ -15,8 +15,8 @@ namespace FluidSim
         public static int screenPerPX = 10;
 
         
-        private RenderWindow win;
-
+        //private RenderWindow win;
+        private GameWindow Window;
         private Container container;
 
         private Options options;
@@ -27,20 +27,15 @@ namespace FluidSim
         {
             options = new Options();
             container = new Container(0.2f, 0, 0.0000001f);
-            win = new RenderWindow(new VideoMode((uint) (rowPxSIZE*screenPerPX), (uint) (columnPxSIZE*screenPerPX)), "Fluid Simulation", Styles.Close | Styles.Titlebar);
-        }
-
-        public void Run()
-        {
-            Vector2i previousMouse = Mouse.GetPosition(win);
-            Vector2i currentMouse = Mouse.GetPosition(win);
-
-            win.Closed += (sender, e) =>
+            //win = new RenderWindow(new VideoMode((uint) (rowPxSIZE*screenPerPX), (uint) (columnPxSIZE*screenPerPX)), "Fluid Simulation", Styles.Close | Styles.Titlebar);
+            Window = new GameWindow("Title",(uint) (rowPxSIZE*screenPerPX), (uint) (columnPxSIZE*screenPerPX));
+            
+            Window.Closed += (sender, e) =>
             {
                 ((Window)sender)?.Close();
                 Dispose();
             };
-            win.KeyPressed += (sender, e) =>
+            Window.KeyPressed += (sender, e) =>
             {
                 if (e.Code == Keyboard.Key.C)
                 {
@@ -51,7 +46,7 @@ namespace FluidSim
                     options.SetColor(c);
                 }
             };
-            win.MouseButtonPressed += (sender, e) =>
+            Window.MouseButtonPressed += (sender, e) =>
             {
                 if (e.Button == Mouse.Button.Right)
                 {
@@ -62,40 +57,56 @@ namespace FluidSim
                     options.SetColor(c);
                 }
             };
-            
+
+        }
+
+        public void Run()
+        {
             var stopwatch = new Stopwatch();
             
-            while (win.IsOpen)
+            Window.SetVisible(true);
+            while (true)
             {
-                stopwatch.Reset();
-                stopwatch.Start();
-                
-                if (Mouse.IsButtonPressed(Mouse.Button.Left))			
-                    container.AddDensity(currentMouse.Y/screenPerPX, currentMouse.X/screenPerPX, 200);
-
-                currentMouse = Mouse.GetPosition(win);
-
-                float amountX = currentMouse.X - previousMouse.X;
-                float amountY = currentMouse.Y - previousMouse.Y;
-
-                container.AddVelocity(currentMouse.Y/screenPerPX, currentMouse.X/screenPerPX, amountY / 10, amountX / 10);
-		
-                previousMouse = currentMouse;
-
-                container.Step();
-                container.Render(ref win, options.GetColor());
-                //container.Dispose();
-                // container.FadeDensity(screenPerPX*screenPerPX);
-		        
-                win.Display();
-                Thread.Yield();
-                if (stopwatch.ElapsedMilliseconds<33)
-                {
-                    
-                    Thread.Sleep(TimeSpan.FromMilliseconds(33)-stopwatch.Elapsed);
-                }
+                Window.DispatchEvents();
+                Window.Clear();
+                Update(stopwatch);
+                Window.Display();
             }
             
+        }
+
+        private void Update(Stopwatch stopwatch)
+        {
+            Vector2i previousMouse = Mouse.GetPosition(Window);
+            Vector2i currentMouse = Mouse.GetPosition(Window);
+            
+            stopwatch.Reset();
+            stopwatch.Start();
+                
+            if (Mouse.IsButtonPressed(Mouse.Button.Left))			
+                container.AddDensity(currentMouse.Y/screenPerPX, currentMouse.X/screenPerPX, 200);
+
+            currentMouse = Mouse.GetPosition(Window);
+
+            float amountX = currentMouse.X - previousMouse.X;
+            float amountY = currentMouse.Y - previousMouse.Y;
+
+            container.AddVelocity(currentMouse.Y/screenPerPX, currentMouse.X/screenPerPX, amountY / 10, amountX / 10);
+		
+            previousMouse = currentMouse;
+
+            container.Step();
+            container.Render(Window, options.GetColor());
+            //container.Dispose();
+            // container.FadeDensity(screenPerPX*screenPerPX);
+		        
+            Window.Display();
+            Thread.Yield();
+            if (stopwatch.ElapsedMilliseconds<33)
+            {
+                    
+                Thread.Sleep(TimeSpan.FromMilliseconds(33)-stopwatch.Elapsed);
+            }
         }
         
         public void Dispose()
